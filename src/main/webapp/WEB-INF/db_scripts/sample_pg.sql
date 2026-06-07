@@ -1,0 +1,19 @@
+\c postgres
+DROP DATABASE IF EXISTS sample;
+DROP ROLE IF EXISTS student;
+CREATE ROLE student WITH PASSWORD 'himitu' LOGIN;
+CREATE DATABASE sample OWNER student ENCODING 'UTF8';
+
+\c sample
+CREATE TABLE emp (
+    code INTEGER PRIMARY KEY,
+    name TEXT,
+    age INTEGER,
+    tel TEXT
+);
+INSERT INTO emp VALUES(1, 'óÈñÿ', 30, '03-1111-1111');
+INSERT INTO emp VALUES(2, 'ç≤ì°', 28, '043-2222-2222');
+INSERT INTO emp VALUES(3, 'ìcíÜ', 46, '05-3333-3333');
+INSERT INTO emp VALUES(4, 'éRìc', 57, '076-4444-4444');
+INSERT INTO emp VALUES(5, 'ñÿë∫', 31, '076-5555-5555');
+ALTER TABLE emp OWNER TO student;
