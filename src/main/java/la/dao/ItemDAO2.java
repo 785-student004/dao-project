@@ -85,6 +85,86 @@ public class ItemDAO2 {
 		}
 	}
 
+	public List<ItemBean> sortAndFind(boolean isAscending, int minPrice, int maxPrice, String pname) throws DAOException{
+		String sql = null;
+		if (isAscending) {
+			if (minPrice == 0) {
+				sql = "SELECT * FROM item WHERE price <= ?";
+			} else if (maxPrice == 0) {
+				sql = "SELECT * FROM item WHERE price >= ?";
+			} else {
+				sql = "SELECT * FROM item WHERE (price BETWEEN ? AND ?)";
+			}
+			if (pname != null) {
+				sql += " AND name LIKE ?";
+			}
+			sql += " ORDER BY price";
+		} else {
+			if (minPrice == 0) {
+				sql = "SELECT * FROM item WHERE price <= ?";
+			} else if (maxPrice == 0) {
+				sql = "SELECT * FROM item WHERE price >= ?";
+			} else {
+				sql = "SELECT * FROM item WHERE (price BETWEEN ? AND ?)";
+			}
+			if (pname != null) {
+				sql += " AND name LIKE ?";
+			}
+			sql += " ORDER BY price desc";
+		}
+		
+		try (// データベースへの接続
+				Connection con = DriverManager.getConnection(url, user, pass);
+				// PreparedStatementオブジェクトの取得
+				PreparedStatement st = con.prepareStatement(sql);) {
+			// プレースホルダのセット
+			if(pname!=null) {
+				pname = "%" + pname + "%";
+			if (minPrice == 0) {
+				st.setInt(1, maxPrice);
+				st.setString(2, pname);
+			} else if (maxPrice == 0) {
+				st.setInt(1, minPrice);
+				st.setString(2, pname);
+			} else {
+				st.setInt(1, minPrice);
+				st.setInt(2, maxPrice);
+				st.setString(3, pname);
+			}
+			}else {
+				if (minPrice == 0) {
+					st.setInt(1, maxPrice);
+				} else if (maxPrice == 0) {
+					st.setInt(1, minPrice);
+				} else {
+					st.setInt(1, minPrice);
+					st.setInt(2, maxPrice);
+				}
+			}
+
+			try (// SQLの実行
+					ResultSet rs = st.executeQuery();) {
+				// 結果の取得
+				List<ItemBean> list = new ArrayList<ItemBean>();
+				while (rs.next()) {
+					int code = rs.getInt("code");
+					String name = rs.getString("name");
+					int price = rs.getInt("price");
+					ItemBean bean = new ItemBean(code, name, price);
+					list.add(bean);
+				}
+				// 商品一覧をListとして返す
+				return list;
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new DAOException("レコードの操作に失敗しました。");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DAOException("レコードの操作に失敗しました。");
+		}
+	}
+
 	public int addItem(String name, int price) throws DAOException {
 		// SQL文の作成
 		String sql = "INSERT INTO item(name, price) VALUES(?, ?)";

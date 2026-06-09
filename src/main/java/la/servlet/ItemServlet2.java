@@ -1,7 +1,6 @@
 package la.servlet;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.servlet.RequestDispatcher;
@@ -48,10 +47,42 @@ public class ItemServlet2 extends HttpServlet {
 			else if (action.equals("sort")) {
 				String key = request.getParameter("key");
 				List<ItemBean> list;
-				if (key.equals("price_asc")) {
-					list = dao.sortPrice(true);
+
+				HttpSession session = request.getSession();
+				int minPrice = 0, maxPrice = 0;
+				String pname = null;
+				try {
+					if (session.getAttribute("minPrice") != null) {
+						minPrice = (int) session.getAttribute("minPrice");
+					} else {
+						minPrice = 0;
+					}
+					if (session.getAttribute("maxPrice") != null) {
+						maxPrice = (int) session.getAttribute("maxPrice");
+					} else {
+						maxPrice = 0;
+					}
+					if (session.getAttribute("productName") != null) {
+						pname = (String) session.getAttribute("productName");
+					} else {
+						pname = null;
+					}
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+				}
+
+				if ((minPrice == 0) && (maxPrice == 0) && (pname == null)) {
+					if (key.equals("price_asc")) {
+						list = dao.sortPrice(true);
+					} else {
+						list = dao.sortPrice(false);
+					}
 				} else {
-					list = dao.sortPrice(false);
+					if (key.equals("price_asc")) {
+						list = dao.sortAndFind(true, minPrice, maxPrice, pname);
+					} else {
+						list = dao.sortAndFind(false, minPrice, maxPrice, pname);
+					}
 				}
 				// Listをリクエストスコープに入れてJSPへフォーワードする
 				request.setAttribute("items", list);
@@ -82,22 +113,9 @@ public class ItemServlet2 extends HttpServlet {
 				}
 
 				HttpSession session = request.getSession();
-				@SuppressWarnings("unchecked")
-				ArrayList<String> searchWord = (ArrayList<String>) session.getAttribute("searching");
-				searchWord = new ArrayList<String>();
-				session.setAttribute("searching", searchWord);
-
-				searchWord.add(pname);
-				if (lePrice != 0) {
-					searchWord.add(String.valueOf(lePrice));
-				} else {
-					searchWord.add("");
-				}
-				if (hePrice != 0) {
-					searchWord.add(String.valueOf(hePrice));
-				} else {
-					searchWord.add("");
-				}
+				session.setAttribute("pname", pname);
+				session.setAttribute("minPrice", lePrice);
+				session.setAttribute("maxPrice", hePrice);
 
 				List<ItemBean> list = null;
 				if (pname == null) {
