@@ -15,6 +15,7 @@ public class CartBean {
 
     public void addCart(ItemBean bean, int nums) {
         ItemBean item = null;
+        //同一商品がすでにカートにあるかどうか確認
         for (ItemBean i : items) {
             if (i.getCode() == bean.getCode()) {
                 item = i;
@@ -22,6 +23,7 @@ public class CartBean {
             }
         }
 		
+        //カートにない(item=null)なら個数をそのままセット、カートにあれば個数を加算
         if (item == null) {
             bean.setQuantity(nums);
             items.add(bean);
@@ -31,6 +33,7 @@ public class CartBean {
     }
 
     public void deleteCart(int itemCode) {
+    	//商品コードを確認して一致したものを削除
         for (ItemBean item : items) {
             if (item.getCode() == itemCode) {
                 items.remove(item);

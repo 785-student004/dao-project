@@ -22,6 +22,7 @@
 <tr><td>商品番号</td><td>商品名</td><td>単価(税込)</td>
     <td>個数</td><td>小計</td><td>削除</td></tr>
 
+<!-- ${cart.items}はセッションスコープにあるcartのフィールドitemsリストを呼び出している -->
 <c:forEach items="${cart.items}" var="item">
 <tr>
     <td align="center">${item.code}</td>
@@ -37,6 +38,10 @@
 </td>
 </tr>
 </c:forEach>
+<!-- ${cart.total}はcartオブジェクトにtotalフィールドがあるのではなく、
+cartの中のgetTotalメソッドを探しに行くため、フィールドがなくともメソッドを設定しておけば
+メソッドによる計算を行い戻り値を入れることができる。 -->
+
 <tr><td align="right" colspan="6">総計：${cart.total}円</td></tr>
 </table>
 
