@@ -114,9 +114,12 @@ public class ItemServlet2 extends HttpServlet {
 
 				HttpSession session = request.getSession();
 				session.setAttribute("pname", pname);
-				session.setAttribute("minPrice", lePrice);
-				session.setAttribute("maxPrice", hePrice);
-
+				if (lePrice != 0) {
+					session.setAttribute("minPrice", lePrice);
+				}
+				if (hePrice != 0) {
+					session.setAttribute("maxPrice", hePrice);
+				}
 				List<ItemBean> list = null;
 				if (pname == null) {
 					list = dao.findByPrice(lePrice, hePrice);
