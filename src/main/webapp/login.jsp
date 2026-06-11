@@ -16,7 +16,7 @@
 
 	<form action="/dao-project/LoginServlet" method="post">
 		メールアドレス：<input type="text" name="email" size="25"><br>
-		パスワード：<input type="text" name="password" size="25"><br> <input
+		パスワード：<input type="password" name="password" size="25"><br> <input
 			type="hidden" name="action" value="login">
 		<button>ログイン</button>
 	</form>

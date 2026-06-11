@@ -5,8 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import la.bean.CustomerBean;
 
@@ -26,7 +24,7 @@ public class CustomerDAO {
 		}
 	}
 
-	public List<CustomerBean> findByEmailAndPassword(String e_mail, String password) throws DAOException {
+	public CustomerBean findByEmailAndPassword(String e_mail, String password) throws DAOException {
 		String sql = "SELECT * FROM customer WHERE (email = ?) AND (password = ?)";
 
 		try (
@@ -39,9 +37,8 @@ public class CustomerDAO {
 
 			try (
 					ResultSet rs = st.executeQuery();) {
-				List<CustomerBean> list = new ArrayList<CustomerBean>();
 
-				while (rs.next()) {
+				if (rs.next()) {
 					int code = rs.getInt("code");
 					String name = rs.getString("name");
 					String address = rs.getString("address");
@@ -50,9 +47,10 @@ public class CustomerDAO {
 					String passwords = rs.getString("password");
 
 					CustomerBean bean = new CustomerBean(code, name, address, tel, email, passwords);
-					list.add(bean);
+					return bean;
+				} else {
+					return null;
 				}
-				return list;
 			} catch (SQLException e) {
 				e.printStackTrace();
 				throw new DAOException("レコードの取得に失敗しました。");

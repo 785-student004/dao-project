@@ -9,6 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import la.bean.CategoryBean;
 import la.bean.CustomerBean;
 import la.dao.CustomerDAO;
@@ -27,21 +28,27 @@ public class LoginServlet extends HttpServlet {
 
 			if (action == null || action.length() == 0 || action.equals("top")) {
 
-				gotoPage(request, response, "/top.jsp");
+				gotoPage(request, response, "/login.jsp");
 
 			} else if (action.equals("login")) {
 				String email = request.getParameter("email");
 				String password = request.getParameter("password");
 
-				List<CustomerBean> list = dao.findByEmailAndPassword(email, password);
+				CustomerBean bean = dao.findByEmailAndPassword(email, password);
 
-				if ((list != null) && (list.size() != 0)) {
-					request.setAttribute("customers", list);
+				if (bean != null) {
+					HttpSession session = request.getSession();
+					session.setAttribute("customer", bean);
 					gotoPage(request, response, "/top.jsp");
 				} else {
 					request.setAttribute("message", "メールアドレスとパスワードが一致しませんでした");
 					gotoPage(request, response, "/login.jsp");
 				}
+			} else if (action.equals("logout")) {
+				HttpSession session = request.getSession();
+				session.removeAttribute("customer");
+
+				gotoPage(request, response, "/top.jsp");
 
 			} else {
 				request.setAttribute("message", "正しく操作してください。");

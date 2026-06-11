@@ -8,13 +8,19 @@
 	<a
 		href="/dao-project/ShowItemServlet?action=list&code=${category.code}&page=1">${category.name}</a>|
 </c:forEach>
-
-<a href="/dao-project/CartServlet?action=show">カートを見る</a>
+<c:if test="${not empty customer}">
+こんにちは、${customer.name}さん｜
+<a href="/dao-project/LoginServlet?action=logout">ログアウト</a>
+</c:if>
+<c:if test="${empty customer}">
+	<a href="/dao-project/LoginServlet?action=top">ログイン</a>
+</c:if>
+｜<a href="/dao-project/CartServlet?action=show">カートを見る</a>
 <br>
 <form action="/dao-project/ShowItemServlet" method="get">
 	<input type="text" name="keyword" size="30"> <input
 		type="hidden" name="action" value="search"><input
 		type="hidden" name="page" value="1">
-		
+
 	<button>検索</button>
 </form>
