@@ -45,7 +45,7 @@ cartの中のgetTotalメソッドを探しに行くため、フィールドが�
 <tr><td align="right" colspan="6">総計：${cart.total}円</td></tr>
 </table>
 
-<form action="/dao-project/OrderServlet?action=input_customer" method="post">
+<form action="/dao-project/OrderServlet?action=confirm&login=check" method="post">
     <button>注文する</button>
 </form>
 </c:if>

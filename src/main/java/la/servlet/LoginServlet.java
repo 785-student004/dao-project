@@ -39,7 +39,11 @@ public class LoginServlet extends HttpServlet {
 				if (bean != null) {
 					HttpSession session = request.getSession();
 					session.setAttribute("customer", bean);
-					gotoPage(request, response, "/top.jsp");
+					if (request.getParameter("login").equals("check")) {
+						gotoPage(request, response, "/confirm.jsp");
+					} else {
+						gotoPage(request, response, "/top.jsp");
+					}
 				} else {
 					request.setAttribute("message", "メールアドレスとパスワードが一致しませんでした");
 					gotoPage(request, response, "/login.jsp");

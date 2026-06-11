@@ -49,24 +49,24 @@ public class OrderDAO {
         }
 
         // 顧客情報の追加SQL文
-        sql = "INSERT INTO customer VALUES(?, ?, ?, ?, ?)";
-		
-        try (// データベースへの接続
-			 Connection con = DriverManager.getConnection(url, user, pass);
-			 // PreparedStatementオブジェクトの取得
-			 PreparedStatement st = con.prepareStatement(sql);) {
-			// プレースホルダーの設定
-			st.setInt(1, customerNumber);
-			st.setString(2, customer.getName());
-			st.setString(3, customer.getAddress());
-			st.setString(4, customer.getTel());
-			st.setString(5, customer.getEmail());
-			// SQLの実行
-			st.executeUpdate();
-        } catch (SQLException e) {
-			e.printStackTrace();
-			throw new DAOException("レコードの操作に失敗しました。");
-        }
+//        sql = "INSERT INTO customer VALUES(?, ?, ?, ?, ?)";
+//		
+//        try (// データベースへの接続
+//			 Connection con = DriverManager.getConnection(url, user, pass);
+//			 // PreparedStatementオブジェクトの取得
+//			 PreparedStatement st = con.prepareStatement(sql);) {
+//			// プレースホルダーの設定
+//			st.setInt(1, customerNumber);
+//			st.setString(2, customer.getName());
+//			st.setString(3, customer.getAddress());
+//			st.setString(4, customer.getTel());
+//			st.setString(5, customer.getEmail());
+//			// SQLの実行
+//			st.executeUpdate();
+//        } catch (SQLException e) {
+//			e.printStackTrace();
+//			throw new DAOException("レコードの操作に失敗しました。");
+//        }
 
         // 注文番号の取得（暗黙シーケンスから取得）
         int orderNumber = 0;
