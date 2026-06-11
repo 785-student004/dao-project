@@ -62,7 +62,7 @@ public class ItemServlet2 extends HttpServlet {
 					} else {
 						maxPrice = 0;
 					}
-					if (session.getAttribute("productName") != null) {
+					if (session.getAttribute("pname") != null) {
 						pname = (String) session.getAttribute("productName");
 					} else {
 						pname = null;

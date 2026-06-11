@@ -99,6 +99,7 @@ public class ItemDAO2 {
 				sql += " AND name LIKE ?";
 			}
 			sql += " ORDER BY price";
+			
 		} else {
 			if (minPrice == 0) {
 				sql = "SELECT * FROM item WHERE price <= ?";

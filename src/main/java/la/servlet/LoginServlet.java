@@ -1,58 +1,76 @@
 package la.servlet;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.List;
 
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import la.bean.CategoryBean;
+import la.bean.CustomerBean;
+import la.dao.CustomerDAO;
+import la.dao.DAOException;
+import la.dao.ItemDAO;
 
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
-	// データベースの代わりにこのユーザ名とパスワードを正しいとする
-	private static final String USER = "jack";
-	private static final String PASS = "abc";
 
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("text/html;charset=UTF-8");
-		PrintWriter out = response.getWriter();
+		try {
+			String action = request.getParameter("action");
 
-		// リクエストパラメータの読み込み
-		String action = request.getParameter("action");
-		if (action.equals("login")) {
-			// ログイン時はユーザ名とパスワードを取得する
-			// パラメータのエラーチェックは省略
-			String name = request.getParameter("name");
-			String passWord = request.getParameter("pw");
+			CustomerDAO dao = new CustomerDAO();
 
-			if (name.equals(USER) && passWord.equals(PASS)) { // ユーザ名とパスワードが一致したら
-				// ユーザ名とパスワードが一致したらログイン処理を行う
-				// セッション管理を行う
-				HttpSession session = request.getSession();
-				// ログイン済みの属性を設定する
-				session.setAttribute("isLogin", "true");
-				out.println("<html><head><title>ShowCart</title></head><body>");
-				out.println("<h1>ログイン成功！</h1>");
-				out.println("</body></html>");
+			if (action == null || action.length() == 0 || action.equals("top")) {
+
+				gotoPage(request, response, "/top.jsp");
+
+			} else if (action.equals("login")) {
+				String email = request.getParameter("email");
+				String password = request.getParameter("password");
+
+				List<CustomerBean> list = dao.findByEmailAndPassword(email, password);
+
+				if ((list != null) && (list.size() != 0)) {
+					
+					request.setAttribute("customers", list);
+					gotoPage(request, response, "/top.jsp");
+				} else {
+					request.setAttribute("message", "メールアドレスとパスワードが一致しませんでした");
+					gotoPage(request, response, "/login.jsp");
+				}
+
 			} else {
-				out.println("<html><head><title>ShowCart</title></head><body>");
-				out.println("<h1>ユーザ名またはパスワードが違います</h1>");
-				out.println("</body></html>");
+				request.setAttribute("message", "正しく操作してください。");
+				gotoPage(request, response, "/errInternal.jsp");
 			}
-		} else if (action.equals("logout")) { // ログアウト時
-			// すでに作成されているセッション領域を取得する。新しくは作成しない
-			HttpSession session = request.getSession(false);
-			if (session != null) {
-				// セッション領域を無効にする
-				session.invalidate();
-				out.println("<html><head><title>ShowCart</title></head><body>");
-				out.println("<h1>ログアウトしました</h1>");
-				out.println("</body></html>");
-			}
+		} catch (DAOException e) {
+			e.printStackTrace();
+			request.setAttribute("message", "内部エラーが発生しました。");
+			gotoPage(request, response, "/errInternal.jsp");
+		}
+	}
+
+	private void gotoPage(HttpServletRequest request,
+			HttpServletResponse response, String page) throws ServletException,
+			IOException {
+		RequestDispatcher rd = request.getRequestDispatcher(page);
+		rd.forward(request, response);
+	}
+
+	public void init() throws ServletException {
+		try {
+			// カテゴリ一覧は最初にアプリケーションスコープへ入れる
+			ItemDAO dao = new ItemDAO();
+			List<CategoryBean> list = dao.findAllCategory();
+			getServletContext().setAttribute("categories", list);
+		} catch (DAOException e) {
+			e.printStackTrace();
+			throw new ServletException();
 		}
 	}
 
