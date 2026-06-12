@@ -13,7 +13,7 @@ public class EmpBean implements Serializable {
 	}
 
 	public EmpBean(int code, String name, int age, String tel) {
-		setAge(code);
+		setCode(code);
 		setName(name);
 		setAge(age);
 		setTel(tel);

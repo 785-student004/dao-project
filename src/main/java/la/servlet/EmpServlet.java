@@ -9,6 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import la.bean.EmpBean;
 import la.dao.DAOException;
 import la.dao.EmpDAO;
@@ -19,25 +20,64 @@ public class EmpServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		try {
-			String minAge = null, maxAge = null;
-			try {
-				minAge = request.getParameter("minAge");
-				maxAge = request.getParameter("maxAge");
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-			}
-
+			String action = request.getParameter("action");
 			EmpDAO dao = new EmpDAO();
+			HttpSession session = request.getSession();
+			session.removeAttribute("minAge");
+			session.removeAttribute("maxAge");
+			session.removeAttribute("numPeople");
+			
+			if (action.equals("between")) {
+				try {
+					String minAge = null, maxAge = null;
+					try {
+						minAge = request.getParameter("minAge");
+						maxAge = request.getParameter("maxAge");
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
 
-			List<EmpBean> list;
-			list = dao.findByAge(minAge, maxAge);
+					List<EmpBean> list;
+					list = dao.findByAge(minAge, maxAge);
 
-			request.setAttribute("employees", list);
-			gotoPage(request, response, "/emp.jsp");
+					request.setAttribute("employees", list);
+					session.setAttribute("minAge", minAge);
+					session.setAttribute("maxAge", maxAge);
+
+					gotoPage(request, response, "/emp.jsp");
+
+				} catch (DAOException e) {
+					e.printStackTrace();
+					request.setAttribute("message", "正しい年齢を入力してください");
+					gotoPage(request, response, "/error.jsp");
+				}
+			} else if (action.equals("limit")) {
+				try {
+					String num = null;
+
+					try {
+						num = request.getParameter("numPeople");
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
+
+					List<EmpBean> list = dao.findByAgeLimit(num);
+
+					request.setAttribute("employees", list);
+					session.setAttribute("numPeople", num);
+
+					gotoPage(request, response, "/emp.jsp");
+
+				} catch (DAOException e) {
+					e.printStackTrace();
+					request.setAttribute("message", "正しい人数を入力してください");
+					gotoPage(request, response, "/error.jsp");
+				}
+			}
 
 		} catch (DAOException e) {
 			e.printStackTrace();
-			request.setAttribute("message", "正しい年齢を入力してください");
+			request.setAttribute("message", "正しい操作をしてください");
 			gotoPage(request, response, "/error.jsp");
 		}
 	}

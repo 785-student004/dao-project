@@ -55,14 +55,43 @@ public class EmpDAO {
 	}
 
 	public List<EmpBean> findByAge(String minAge, String maxAge) throws DAOException {
-		String sql = "SELECT * FROM emp WHERE age BETWEEN ? AND ?";
+		String sql = "SELECT * FROM emp WHERE age BETWEEN ? AND ? ORDER BY code";
 
 		try (
 				Connection con = DriverManager.getConnection(url, user, pass);
 				PreparedStatement st = con.prepareStatement(sql);) {
 
-			st.setString(1, minAge);
-			st.setString(2, maxAge);
+			st.setInt(1, Integer.parseInt(minAge));
+			st.setInt(2, Integer.parseInt(maxAge));
+			try (ResultSet rs = st.executeQuery();) {
+				List<EmpBean> list = new ArrayList<EmpBean>();
+				while (rs.next()) {
+					int code = rs.getInt("code");
+					String name = rs.getString("name");
+					int age = rs.getInt("age");
+					String tel = rs.getString("tel");
+					EmpBean bean = new EmpBean(code, name, age, tel);
+					list.add(bean);
+				}
+				return list;
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new DAOException("レコードの操作に失敗しました。");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DAOException("レコードの取得に失敗しました。");
+		}
+	}
+
+	public List<EmpBean> findByAgeLimit(String num) throws DAOException {
+		String sql = "SELECT * FROM emp ORDER BY age desc LIMIT ?";
+
+		try (
+				Connection con = DriverManager.getConnection(url, user, pass);
+				PreparedStatement st = con.prepareStatement(sql);) {
+
+			st.setInt(1, Integer.parseInt(num));
 			try (ResultSet rs = st.executeQuery();) {
 				List<EmpBean> list = new ArrayList<EmpBean>();
 				while (rs.next()) {
